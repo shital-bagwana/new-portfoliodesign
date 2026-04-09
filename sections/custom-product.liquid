@@ -1,0 +1,114 @@
+<div class="custom-product-wrapper">
+  <div class="custom-product-content page-width-narrow">
+    <div class="custom-grid">
+      {% assign product = all_products[section.settings.product] %}
+
+      <!-- LEFT IMAGE -->
+      <div class="shopify-custom-grid-item">
+        <div class="main_product_image">
+          <img src="{{ product.featured_image | img_url: 'master' }}" alt="{{ product.title }}">
+        </div>
+      </div>
+
+      <!-- RIGHT CONTENT -->
+      <div class="shopify-custom-grid-item">
+        <div class="product_details">
+          {% for block in section.blocks %}
+            {% case block.type %}
+              {% when 'title' %}
+                <h2>{{ product.title }}</h2>
+
+              {% when 'price' %}
+                <div class="product_price">
+                  <span class="current_price">{{ product.price | money }}</span>
+                  {% if product.compare_at_price > product.price %}
+                    <span class="compare_price">{{ product.compare_at_price | money }}</span>
+                  {% endif %}
+                </div>
+
+              {% when 'description' %}
+                <div class="product_description">
+                  {{ product.description }}
+                </div>
+
+              {% when 'variants' %}
+                <div class="product-variant-options">
+                  {% for option in product.options_with_values %}
+                    <h4>{{ option.name }}</h4>
+                    {% for value in option.values %}
+                      <span class="option_value">{{ value }}</span>
+                    {% endfor %}
+                  {% endfor %}
+                </div>
+
+              {% when 'quantity' %}
+                <div class="qty-input-group">
+                  <button type="button" class="qty-count" data-action="minus">-</button>
+                  <input type="number" class="product-qty" value="1" min="1">
+                  <button type="button" class="qty-count" data-action="plus">+</button>
+                </div>
+
+              {% when 'buttons' %}
+                <div class="product-buttons">
+                  <button class="btn-buy-now">BUY NOW</button>
+                  <button class="btn-add-to-cart">ADD TO CART</button>
+                </div>
+            {% endcase %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Custom Product",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Select Product"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "title",
+      "name": "Product Title"
+    },
+    {
+      "type": "price",
+      "name": "Product Price"
+    },
+    {
+      "type": "description",
+      "name": "Product Description"
+    },
+    {
+      "type": "variants",
+      "name": "Product Variants"
+    },
+    {
+      "type": "quantity",
+      "name": "Quantity Selector"
+    },
+    {
+      "type": "buttons",
+      "name": "Buttons"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Product Template",
+      "blocks": [
+        { "type": "title" },
+        { "type": "price" },
+        { "type": "description" },
+        { "type": "variants" },
+        { "type": "quantity" },
+        { "type": "buttons" }
+      ]
+    }
+  ]
+}
+{% endschema %}
