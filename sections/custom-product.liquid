@@ -5,8 +5,33 @@
 
       <!-- LEFT IMAGE -->
       <div class="shopify-custom-grid-item">
-        <div class="main_product_image">
-          <img src="{{ product.featured_image | img_url: 'master' }}" alt="{{ product.title }}">
+        <div class="product_flx">
+          {% comment %} <div class="product_col"> {% endcomment %}
+          <div class="main_product_image">
+            <img
+              src="{{ product.featured_image | img_url: 'master' }}"
+              alt="{{ product.title }}"
+              width=""
+              height=""
+              id="main-product-img"
+            >
+          </div>
+          {% comment %} </div> {% endcomment %}
+          <div class="product_col">
+            <div class="product_thumbnail">
+              {% for image in product.images %}
+                <div class="thumbnail_item">
+                  <img
+                    src="{{ image | img_url: 'master'}}"
+                    alt="{{ product.title }}"
+                    width=""
+                    height=""
+                    class="thumbnail_button_img"
+                  >
+                </div>
+              {% endfor %}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -35,9 +60,11 @@
                 <div class="product-variant-options">
                   {% for option in product.options_with_values %}
                     <h4>{{ option.name }}</h4>
-                    {% for value in option.values %}
-                      <span class="option_value">{{ value }}</span>
-                    {% endfor %}
+                    <div class="option_data">
+                      {% for value in option.values %}
+                        <span class="option_value" value="{{ value }}">{{ value }}</span>
+                      {% endfor %}
+                    </div>
                   {% endfor %}
                 </div>
 
@@ -95,6 +122,10 @@
     {
       "type": "buttons",
       "name": "Buttons"
+    },
+    {
+      "type": "product_thumbnails",
+      "name": "Product Thumbnails"
     }
   ],
   "presets": [
@@ -106,7 +137,8 @@
         { "type": "description" },
         { "type": "variants" },
         { "type": "quantity" },
-        { "type": "buttons" }
+        { "type": "buttons" },
+        { "type": "product_thumbnails" }
       ]
     }
   ]
