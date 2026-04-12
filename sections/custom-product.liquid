@@ -57,22 +57,36 @@
                 </div>
 
               {% when 'variants' %}
-                <div class="product-variant-options">
-                  {% for option in product.options_with_values %}
-                    <h4>{{ option.name }}</h4>
-                    <div class="option_data">
-                      {% for value in option.values %}
-                        <span class="option_value" value="{{ value }}">{{ value }}</span>
-                      {% endfor %}
-                    </div>
-                  {% endfor %}
+                <div class="product_variant_box">
+                  <div class="variant-box hidden">
+                    {% for variant in product.variants %}
+                      <span
+                        class="variant_option"
+                        data-variant-id="{{ variant.id }}"
+                        data-variant-title="{{ variant.title }}"
+                        data-variant-price="{{ variant.price | money }}"
+                      >
+                        {{- variant.title -}}
+                      </span>
+                    {% endfor %}
+                  </div>
+                  <div class="product-variant-options">
+                    {% for option in product.options_with_values %}
+                      <h4>{{ option.name }}</h4>
+                      <div class="option_data">
+                        {% for value in option.values %}
+                          <span class="option_value" value="{{ value }}">{{ value }}</span>
+                        {% endfor %}
+                      </div>
+                    {% endfor %}
+                  </div>
                 </div>
 
               {% when 'quantity' %}
                 <div class="qty-input-group">
-                  <button type="button" class="qty-count" data-action="minus">-</button>
-                  <input type="number" class="product-qty" value="1" min="1">
-                  <button type="button" class="qty-count" data-action="plus">+</button>
+                  <button type="button" id="decrement-btn" class="qty-count" data-action="minus">-</button>
+                  <input type="number" id="quantity-input" class="product-qty" value="1" min="1">
+                  <button type="button" id="increment-btn" class="qty-count" data-action="plus">+</button>
                 </div>
 
               {% when 'buttons' %}

@@ -1,0 +1,392 @@
+<style>
+  .custom-bundle-section .bundle_product_container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+  }
+  .custom-bundle-section .page-width {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .custom-bundle-section .block_box {
+    border: 1px solid #eee;
+    padding: 15px;
+    border-radius: 12px;
+    transition: 0.3s;
+    background: #fff;
+  }
+
+  .custom-bundle-section .block_box:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  }
+
+  .custom-bundle-section .prodctImage img {
+    width: 100%;
+    border-radius: 10px;
+    object-fit: contain;
+    max-height: 50vh;
+  }
+
+  .custom-bundle-section .thumbnail-img {
+    width: 50px;
+    height: 50px;
+    margin: 5px;
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 6px;
+  }
+
+  .custom-bundle-section .thumbnail-img.active {
+    border-color: #000;
+  }
+
+  .custom-bundle-section .variant-label {
+    font-weight: 600;
+    margin-top: 10px;
+  }
+
+  .custom-bundle-section .variant-values {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .custom-bundle-section .variant-pill {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+  }
+
+  .custom-bundle-section .variant-pill.active {
+    background: #000;
+    color: #fff;
+    border-color: #000;
+  }
+
+  .custom-bundle-section .button_bundle {
+    margin-top: 15px;
+    width: 100%;
+    padding: 10px;
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .custom-bundle-section .button_bundle:hover {
+    background: #333;
+  }
+
+  .custom-bundle-section .button_bundle:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+  .custom-bundle-section .porduct_row_thumbnail {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    border-top: 1px solid gray;
+    overflow-x: scroll;
+  }
+  .custom-bundle-section .prodctImage {
+    width: 100%;
+    /* height: 100%; */
+  }
+
+  .custom-bundle-section .bundle-main-btn {
+    margin-top: 30px;
+    {% comment %} width: 100%; {% endcomment %}
+    padding: 14px;
+    font-size: 16px;
+    background: #000;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  .custom-bundle-section .bundle-header h2 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 25px;
+  }
+  .custom-bundle-section .bundle-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+<div class="custom-bundle-section">
+  <div class="page-width">
+    <div class="bundle-header">
+      {% if section.settings.title != blank %}
+        <h2>{{ section.settings.title }}</h2>
+      {% endif %}
+    </div>
+
+    <div class="bundle_product_container">
+      {% for block in section.blocks %}
+        {% assign bundle_product = block.settings.productId %}
+        <div class="block_box">
+          <div class="prodctImage">
+            <img
+              src="{{ bundle_product.featured_image | img_url: '500x500' }}"
+              class="main-product-image"
+              alt="{{ bundle_product.title }}"
+              loading="lazy"
+              width=""
+              height=""
+            >
+          </div>
+
+          <div class="porduct_row_thumbnail">
+            {% for image in bundle_product.images %}
+              <img
+                src="{{ image.src | img_url:'50x50' }}"
+                class="thumbnail-img"
+                alt="{{ image.title }}"
+                width=""
+                height=""
+                data-full="{{ image.src | img_url:'500x500' }}"
+              >
+            {% endfor %}
+          </div>
+
+          <div class="block_title_box">
+            <a href="{{ bundle_product.url }}">{{ bundle_product.title }}</a>
+            <h3>{{ bundle_product.price | money_with_currency }}</h3>
+
+            {% comment %}
+              Bundle option variant get
+            {% endcomment %}
+            <div class="variantGet hidden">
+              {% for variant in bundle_product.variants %}
+                <p
+                  class="titlebox"
+                  variant_title="{{ variant.title }}"
+                  variantId="{{variant.id }}"
+                >
+                  {{ variant.title }}
+                </p>
+              {% endfor %}
+            </div>
+
+            {% comment %}
+              Option loop
+            {% endcomment %}
+
+            <div class="variant-picker">
+              {% for option in bundle_product.options_with_values %}
+                <div class="variant-group">
+                  <p class="variant-label">{{ option.name }}</p>
+
+                  <div class="variant-values">
+                    {% for value in option.values %}
+                      <span
+                        class="variant-pill"
+                        data-option-name="{{ option.name }}"
+                        data-option-value="{{ value }}"
+                      >
+                        {{ value }}
+                      </span>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+
+            {% if bundle_product.available %}
+              <button
+                class="button_bundle"
+                data-id="{{ bundle_product.variants.first.id }}"
+              >
+                Add to bundle
+              </button>
+            {% else %}
+              <button class="button_bundle out_of_stock" disabled>Out of stock</button>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="bundle-footer">
+      <button class="bundle-main-btn">Add bundle to cart</button>
+    </div>
+  </div>
+</div>
+
+{% javascript %}
+  document.querySelectorAll('.block_box').forEach((block) => {
+    let selectedVariantId = null;
+
+    const variantTitles = block.querySelectorAll('.variantGet .titlebox');
+    const addButton = block.querySelector('.button_bundle');
+
+    // 👉 Default select first variant
+    const firstVariant = variantTitles[0];
+    if (firstVariant) {
+      selectedVariantId = firstVariant.getAttribute('variantId');
+      addButton.setAttribute('data-id', selectedVariantId);
+    }
+
+    // 👉 Variant click
+    block.querySelectorAll('.variant-pill').forEach((pill) => {
+      pill.addEventListener('click', () => {
+        const group = pill.closest('.variant-group');
+
+        // Active UI
+        group.querySelectorAll('.variant-pill').forEach((p) => p.classList.remove('active'));
+        pill.classList.add('active');
+
+        // Get selected values
+        let selectedValues = [];
+        block.querySelectorAll('.variant-pill.active').forEach((activePill) => {
+          selectedValues.push(activePill.dataset.optionValue);
+        });
+
+        const combination = selectedValues.join(' / ');
+
+        // Match variant
+        variantTitles.forEach((v) => {
+          if (v.getAttribute('variant_title') === combination) {
+            selectedVariantId = v.getAttribute('variantId');
+            addButton.setAttribute('data-id', selectedVariantId);
+          }
+        });
+      });
+    });
+
+    // 👉 Add to cart (per product)
+    addButton.addEventListener('click', () => {
+      const variantId = addButton.getAttribute('data-id');
+
+      if (!variantId) {
+        alert('Please select variant');
+        return;
+      }
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: variantId, quantity: 1 }),
+      })
+        .then((res) => res.json())
+        .then(() => {
+          addButton.innerText = 'Added ✅';
+          addButton.disabled = true;
+        })
+        .catch((err) => console.error(err));
+    });
+
+    // 👉 Thumbnail switch
+    const mainImage = block.querySelector('.main-product-image');
+
+    block.querySelectorAll('.thumbnail-img').forEach((thumb) => {
+      thumb.addEventListener('click', () => {
+        mainImage.src = thumb.dataset.full;
+
+        block.querySelectorAll('.thumbnail-img').forEach((t) => t.classList.remove('active'));
+        thumb.classList.add('active');
+      });
+    });
+  });
+{% endjavascript %}
+
+{% comment %}
+  Bundle Product Add to card
+{% endcomment %}
+
+{% comment %}
+  {% javascript %}
+    // const productButtons = document.querySelectorAll('.button_bundle:not(.out_of_stock)');
+    // const mainButton = document.querySelector('.bundle-main-btn');
+
+    // let bundleItems = [];
+
+    // productButtons.forEach((btn) => {
+    //   btn.addEventListener('click', () => {
+    //     const variantId = btn.getAttribute('data-id');
+
+    //     if (!bundleItems.includes(variantId)) {
+    //       bundleItems.push(variantId);
+    //       btn.textContent = 'Added';
+    //       btn.disabled = true;
+    //     }
+
+    //     //   console.log('Bundle items:', bundleItems);
+    //   });
+    // });
+
+    // Add whole bundle to cart
+    // mainButton.addEventListener('click', () => {
+    //   if (bundleItems.length === 0) {
+    //     alert('Please select at least one product');
+    //     return;
+    //   }
+
+    //   const items = bundleItems.map((id) => ({
+    //     id: id,
+    //     quantity: 1,
+    //   }));
+
+    //   fetch('/cart/add.js', {
+    //     method: 'POST',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify({ items }),
+    //   })
+    //     .then((res) => res.json())
+    //     .then(() => {
+    //       window.location.href = '/cart';
+    //     })
+    //     .catch((err) => console.error('Cart error:', err));
+    // });
+  {% endjavascript %}
+{% endcomment %}
+
+{% schema %}
+{
+  "name": "Custom Bundle Section",
+  "class": "custom-bundle-section",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Header Part",
+      "info": "create a bundle for better performance"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Custom Bundle Prodcut"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Add Product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "productId",
+          "label": "Add Product"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Bundle Section"
+    }
+  ]
+}
+{% endschema %}
