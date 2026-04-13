@@ -270,6 +270,38 @@
         "padding-block-end": 0
       }
     },
+    "custom_bundle_GxJRc4": {
+      "type": "custom-bundle",
+      "blocks": {
+        "product_t8iter": {
+          "type": "product",
+          "settings": {
+            "productId": "western-women-product-18"
+          }
+        },
+        "product_FQDPm7": {
+          "type": "product",
+          "settings": {
+            "productId": "western-women-product-16"
+          }
+        },
+        "product_idGjJ9": {
+          "type": "product",
+          "settings": {
+            "productId": "western-women-product-20"
+          }
+        }
+      },
+      "block_order": [
+        "product_t8iter",
+        "product_FQDPm7",
+        "product_idGjJ9"
+      ],
+      "name": "Custom Bundle Section",
+      "settings": {
+        "title": "Custom Bundle Prodcut"
+      }
+    },
     "product_recommendations_qggXJq": {
       "type": "product-recommendations",
       "blocks": {
@@ -414,6 +446,7 @@
   },
   "order": [
     "main",
+    "custom_bundle_GxJRc4",
     "product_recommendations_qggXJq"
   ]
 }
