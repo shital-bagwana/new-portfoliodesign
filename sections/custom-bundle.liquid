@@ -230,23 +230,27 @@
     const variantTitles = block.querySelectorAll('.variantGet .titlebox');
     const addButton = block.querySelector('.button_bundle');
 
-    // 👉 Default select first variant
+    //  Default select first variant
     const firstVariant = variantTitles[0];
     if (firstVariant) {
       selectedVariantId = firstVariant.getAttribute('variantId');
       addButton.setAttribute('data-id', selectedVariantId);
+
+      // also make first pills active
+      block.querySelectorAll('.variant-group').forEach((group) => {
+        const firstPill = group.querySelector('.variant-pill');
+        if (firstPill) firstPill.classList.add('active');
+      });
     }
 
-    // 👉 Variant click
+    //  Variant click
     block.querySelectorAll('.variant-pill').forEach((pill) => {
       pill.addEventListener('click', () => {
         const group = pill.closest('.variant-group');
 
-        // Active UI
         group.querySelectorAll('.variant-pill').forEach((p) => p.classList.remove('active'));
         pill.classList.add('active');
 
-        // Get selected values
         let selectedValues = [];
         block.querySelectorAll('.variant-pill.active').forEach((activePill) => {
           selectedValues.push(activePill.dataset.optionValue);
@@ -254,7 +258,6 @@
 
         const combination = selectedValues.join(' / ');
 
-        // Match variant
         variantTitles.forEach((v) => {
           if (v.getAttribute('variant_title') === combination) {
             selectedVariantId = v.getAttribute('variantId');
@@ -264,94 +267,63 @@
       });
     });
 
-    // 👉 Add to cart (per product)
-    addButton.addEventListener('click', () => {
-      const variantId = addButton.getAttribute('data-id');
-
-      if (!variantId) {
-        alert('Please select variant');
-        return;
-      }
-
-      fetch('/cart/add.js', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: variantId, quantity: 1 }),
-      })
-        .then((res) => res.json())
-        .then(() => {
-          addButton.innerText = 'Added ✅';
-          addButton.disabled = true;
-        })
-        .catch((err) => console.error(err));
-    });
-
-    // 👉 Thumbnail switch
+    // Thumbnail switch
     const mainImage = block.querySelector('.main-product-image');
-
     block.querySelectorAll('.thumbnail-img').forEach((thumb) => {
       thumb.addEventListener('click', () => {
-        mainImage.src = thumb.dataset.full;
+        if (mainImage) mainImage.src = thumb.dataset.full;
 
         block.querySelectorAll('.thumbnail-img').forEach((t) => t.classList.remove('active'));
         thumb.classList.add('active');
       });
     });
   });
+
+  // Bundle Logic
+  const productButtons = document.querySelectorAll('.button_bundle:not(.out_of_stock)');
+  const mainButton = document.querySelector('.bundle-main-btn');
+
+  let bundleItems = [];
+
+  productButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const variantId = btn.getAttribute('data-id');
+
+      if (!variantId) return;
+
+      if (!bundleItems.includes(variantId)) {
+        bundleItems.push(variantId);
+        btn.textContent = 'Added ✅';
+        btn.disabled = true;
+      }
+    });
+  });
+
+  if (mainButton) {
+    mainButton.addEventListener('click', () => {
+      if (bundleItems.length === 0) {
+        alert('Please select at least one product');
+        return;
+      }
+
+      const items = bundleItems.map((id) => ({
+        id: id,
+        quantity: 1,
+      }));
+
+      fetch('/cart/add.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items }),
+      })
+        .then((res) => res.json())
+        .then(() => {
+          window.location.href = '/cart';
+        })
+        .catch((err) => console.error('Cart error:', err));
+    });
+  }
 {% endjavascript %}
-
-{% comment %}
-  Bundle Product Add to card
-{% endcomment %}
-
-{% comment %}
-  {% javascript %}
-    // const productButtons = document.querySelectorAll('.button_bundle:not(.out_of_stock)');
-    // const mainButton = document.querySelector('.bundle-main-btn');
-
-    // let bundleItems = [];
-
-    // productButtons.forEach((btn) => {
-    //   btn.addEventListener('click', () => {
-    //     const variantId = btn.getAttribute('data-id');
-
-    //     if (!bundleItems.includes(variantId)) {
-    //       bundleItems.push(variantId);
-    //       btn.textContent = 'Added';
-    //       btn.disabled = true;
-    //     }
-
-    //     //   console.log('Bundle items:', bundleItems);
-    //   });
-    // });
-
-    // Add whole bundle to cart
-    // mainButton.addEventListener('click', () => {
-    //   if (bundleItems.length === 0) {
-    //     alert('Please select at least one product');
-    //     return;
-    //   }
-
-    //   const items = bundleItems.map((id) => ({
-    //     id: id,
-    //     quantity: 1,
-    //   }));
-
-    //   fetch('/cart/add.js', {
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify({ items }),
-    //   })
-    //     .then((res) => res.json())
-    //     .then(() => {
-    //       window.location.href = '/cart';
-    //     })
-    //     .catch((err) => console.error('Cart error:', err));
-    // });
-  {% endjavascript %}
-{% endcomment %}
 
 {% schema %}
 {
